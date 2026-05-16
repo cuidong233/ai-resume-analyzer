@@ -1,0 +1,35 @@
+edition: 3.0.0
+name: ai-resume-analyzer
+access: default
+
+resources:
+  resume-api:
+    component: fc3
+    props:
+      region: cn-hangzhou
+      functionName: ai-resume-analyzer
+      runtime: custom
+      code: .
+      handler: not-used
+      timeout: 60
+      memorySize: 1024
+      cpu: 0.5
+      diskSize: 512
+      environmentVariables:
+        PYTHONPATH: /code
+        ALLOWED_ORIGINS: "*"
+      customRuntimeConfig:
+        command:
+          - python
+          - serverless_handler.py
+        port: 9000
+      triggers:
+        - triggerName: httpTrigger
+          triggerType: http
+          qualifier: LATEST
+          triggerConfig:
+            authType: anonymous
+            methods:
+              - GET
+              - POST
+              - OPTIONS
