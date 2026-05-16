@@ -8,19 +8,22 @@ resources:
     props:
       region: cn-hangzhou
       functionName: ai-resume-analyzer
-      runtime: custom
-      code: .
+      runtime: custom.debian10
+      code: .fc/code
       handler: not-used
       timeout: 60
       memorySize: 1024
       cpu: 0.5
       diskSize: 512
       environmentVariables:
+        PATH: /opt/python3.10/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
         PYTHONPATH: /code
         ALLOWED_ORIGINS: "*"
+      layers:
+        - acs:fc:cn-hangzhou:official:layers/Python310/versions/3
       customRuntimeConfig:
         command:
-          - python
+          - /opt/python3.10/bin/python3.10
           - serverless_handler.py
         port: 9000
       triggers:
