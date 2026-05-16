@@ -4,6 +4,7 @@ import {
   AlertCircle,
   BadgeCheck,
   BriefcaseBusiness,
+  CheckCircle2,
   FileText,
   Loader2,
   Mail,
@@ -12,6 +13,7 @@ import {
   Sparkles,
   UploadCloud
 } from "lucide-react";
+import heroImage from "./assets/resume-analysis-hero.png";
 import "./styles.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
@@ -88,7 +90,51 @@ function App() {
 
   return (
     <main className="shell">
-      <section className="workspace">
+      <section className="hero">
+        <div className="heroCopy">
+          <p className="eyebrow">AI Resume Screening Console</p>
+          <h1>AI 赋能的智能简历分析系统</h1>
+          <p className="heroLead">
+            上传 PDF 简历，自动抽取候选人信息，并基于岗位 JD 输出关键词覆盖和匹配评分。
+          </p>
+          <div className="heroActions">
+            <a href="#workspace" className="primaryBtn">
+              <UploadCloud size={17} />
+              开始分析
+            </a>
+            <span className="heroNote">
+              <CheckCircle2 size={16} />
+              支持规则抽取、AI 增强与缓存复用
+            </span>
+          </div>
+        </div>
+
+        <div className="heroVisual" aria-hidden="true">
+          <img src={heroImage} alt="" />
+          <div className="heroSignal one" />
+          <div className="heroSignal two" />
+        </div>
+      </section>
+
+      <section className="quickStats" aria-label="系统能力">
+        <div>
+          <span>01</span>
+          <strong>PDF 解析</strong>
+          <p>兼容多页简历，清洗文本并保留关键段落。</p>
+        </div>
+        <div>
+          <span>02</span>
+          <strong>信息抽取</strong>
+          <p>姓名、电话、邮箱、技能、学历与项目经历。</p>
+        </div>
+        <div>
+          <span>03</span>
+          <strong>岗位匹配</strong>
+          <p>拆解 JD 关键词，输出维度评分和解释。</p>
+        </div>
+      </section>
+
+      <section className="workspace" id="workspace">
         <aside className="sidebar">
           <div className="brand">
             <span className="brandMark"><Sparkles size={18} /></span>
