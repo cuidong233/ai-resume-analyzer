@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Resume Analyzer API Docs</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css" />
+    <style>
+      body {
+        margin: 0;
+        background: #f7faf8;
+      }
+
+      .topbar {
+        padding: 18px 28px;
+        border-bottom: 1px solid #d9e5df;
+        background: #fff;
+        color: #111c1b;
+        font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      }
+
+      .topbar strong {
+        display: block;
+        font-size: 18px;
+      }
+
+      .topbar span {
+        color: #667472;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <strong>AI Resume Analyzer API</strong>
+      <span>后端地址：https://ai-resuanalyzer-xfvnkaefsf.cn-hangzhou.fcapp.run</span>
+    </div>
+    <div id="swagger-ui"></div>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+      const specUrl = "https://ai-resuanalyzer-xfvnkaefsf.cn-hangzhou.fcapp.run/openapi.json";
+
+      async function fetchSpecWithRetry(url, retries = 5) {
+        let lastError;
+        for (let attempt = 0; attempt <= retries; attempt += 1) {
+          try {
+            const response = await fetch(url, { cache: "no-store" });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
+          } catch (error) {
+            lastError = error;
+            await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+          }
+        }
+        throw lastError;
+      }
+
+      fetchSpecWithRetry(specUrl)
+        .then((spec) => {
+          SwaggerUIBundle({
+            spec,
+            dom_id: "#swagger-ui",
+            layout: "BaseLayout",
+            deepLinking: true,
+            showExtensions: true,
+            showCommonExtensions: true,
+            presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIBundle.SwaggerUIStandalonePreset,
+            ],
+          });
+        })
+        .catch((error) => {
+          document.getElementById("swagger-ui").innerHTML =
+            `<pre style="padding:24px;color:#b63838">OpenAPI 加载失败：${error.message}</pre>`;
+        });
+    </script>
+  </body>
+</html>

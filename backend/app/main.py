@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 
 from app.config import Settings, get_settings
 from app.models import MatchRequest, MatchResponse, ResumeParseResponse, ResumeProfile
@@ -21,6 +22,7 @@ app = FastAPI(
     title="AI Resume Analyzer",
     description="PDF 简历解析、AI 关键信息提取、岗位匹配评分服务",
     version="1.0.0",
+    docs_url=None,
 )
 
 app.add_middleware(
@@ -32,9 +34,73 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def force_inline_content_disposition(request, call_next):
+    response = await call_next(request)
+    response.headers["Content-Disposition"] = "inline"
+    return response
+
+
 @app.get("/health")
 async def health() -> Dict[str, Any]:
     return {"status": "ok", "ai_enabled": bool(settings.openai_api_key), "redis_enabled": bool(settings.redis_url)}
+
+
+@app.get("/docs", include_in_schema=False)
+async def custom_docs() -> HTMLResponse:
+    return HTMLResponse(
+        """
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI Resume Analyzer - Swagger UI</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css" />
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+      async function fetchSpecWithRetry(url, retries = 4) {
+        let lastError;
+        for (let attempt = 0; attempt <= retries; attempt += 1) {
+          try {
+            const response = await fetch(url, { cache: "no-store" });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
+          } catch (error) {
+            lastError = error;
+            await new Promise((resolve) => setTimeout(resolve, 400 * (attempt + 1)));
+          }
+        }
+        throw lastError;
+      }
+
+      fetchSpecWithRetry("/openapi.json")
+        .then((spec) => {
+          SwaggerUIBundle({
+            spec,
+            dom_id: "#swagger-ui",
+            layout: "BaseLayout",
+            deepLinking: true,
+            showExtensions: true,
+            showCommonExtensions: true,
+            presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIBundle.SwaggerUIStandalonePreset,
+            ],
+          });
+        })
+        .catch((error) => {
+          document.getElementById("swagger-ui").innerHTML =
+            `<pre style="padding:24px;color:#b63838">OpenAPI 加载失败：${error.message}</pre>`;
+        });
+    </script>
+  </body>
+</html>
+        """,
+        headers={"Content-Disposition": "inline"},
+    )
 
 
 @app.post("/api/resumes", response_model=ResumeParseResponse)
