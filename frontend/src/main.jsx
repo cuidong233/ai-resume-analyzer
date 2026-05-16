@@ -111,8 +111,6 @@ function App() {
 
         <div className="heroVisual" aria-hidden="true">
           <img src={heroImage} alt="" />
-          <div className="heroSignal one" />
-          <div className="heroSignal two" />
         </div>
       </section>
 
